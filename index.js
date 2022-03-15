@@ -16,28 +16,56 @@ async function init() {
 
     await sleep(2000);
 
+    await page.waitForSelector(`.pointer.DropDownHeaderElement:first-of-type`);
+
     await page.click('.pointer.DropDownHeaderElement:first-of-type');
 
     const randomId = page.url().split('/').pop();
 
     await page.goto(`https://www.dimepkairos.com.br/Dimep/PedidosJustificativas/Index/${randomId}`);
 
-    const currentDate = new Date().toLocaleDateString('pt-BR').replaceAll('/', '_');
+    await page.waitForSelector(`.floatLeft.DiaApontamento .LastSlot input`, {timeout: 3000});
 
-    await page.waitForSelector(`.floatLeft.DiaApontamento .LastSlot input`);
 
+    const currentDatePptr = new Date().toLocaleDateString('pt-BR').replaceAll('/', '_');
 
     await page.evaluate(_ => {
-        console.log($)
-        $('.floatLeft.DiaApontamento:last-of-type').find('.LastSlot input').val('09:22');
+       
+        const currentDate = new Date().toLocaleDateString('pt-BR').replaceAll('/', '_');
+
+        $(`.floatLeft.DiaApontamento.${currentDate}`).addClass(`data-${currentDate}`);
+
     });
-   
 
+        
+    await page.waitForSelector(
+        `.data-${currentDatePptr} .LastSlot input`, 
+        {
+            timeout: 3000
+        }
+    );
 
-   
-    await page.waitForNavigation();
+    await page.$eval(`.data-${currentDatePptr} .TimeIN input`, el => el.value = '09:00');
+    await page.click(`.data-${currentDatePptr} .emptySlot`),
 
-    //await browser.close();
+    await page.keyboard.type('18:00');
+    await page.click(`.data-${currentDatePptr} .emptySlot`);
+    await page.keyboard.type('13:00');
+    await page.click(`.data-${currentDatePptr} .emptySlot`);
+    await page.keyboard.type('12:00'); 
+    
+    await page.click('#ButtonSalvarApontamentos');
+    await page.waitForSelector(
+        `#JustificativaSelect`, 
+        {
+            timeout: 3000
+        }
+    );
+    await page.select('#JustificativaSelect','Home Office - Contingência');
+    await page.click('input[value="Aplicar a Todos"]','Home Office - Contingência');
+    await page.click('#SaveHorarios');
+
+    console.log(`horas para o dia ${new Date().toLocaleDateString('pt-BR')} lançadas com sucesso!`);
 }
 
 function sleep(ms) {
