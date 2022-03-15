@@ -14,13 +14,26 @@ async function init() {
     
     await page.hover('.toogleUserNameWrapper');
 
-    await sleep(300);
+    await sleep(2000);
 
     await page.click('.pointer.DropDownHeaderElement:first-of-type');
 
     const randomId = page.url().split('/').pop();
 
     await page.goto(`https://www.dimepkairos.com.br/Dimep/PedidosJustificativas/Index/${randomId}`);
+
+    const currentDate = new Date().toLocaleDateString('pt-BR').replaceAll('/', '_');
+
+    await page.waitForSelector(`.floatLeft.DiaApontamento .LastSlot input`);
+
+
+    await page.evaluate(_ => {
+        console.log($)
+        $('.floatLeft.DiaApontamento:last-of-type').find('.LastSlot input').val('09:22');
+    });
+   
+
+
    
     await page.waitForNavigation();
 
