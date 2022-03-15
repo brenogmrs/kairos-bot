@@ -66,6 +66,8 @@ async function init() {
     await page.click('#SaveHorarios');
 
     console.log(`horas para o dia ${new Date().toLocaleDateString('pt-BR')} lançadas com sucesso!`);
+
+    await page.close();
 }
 
 function sleep(ms) {
