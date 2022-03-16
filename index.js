@@ -26,16 +26,13 @@ async function init() {
 
     await page.waitForSelector(`.floatLeft.DiaApontamento .LastSlot input`, {timeout: 3000});
 
-
     const currentDatePptr = new Date().toLocaleDateString('pt-BR').replaceAll('/', '_');
 
-    await page.evaluate(_ => {
-       
-        const currentDate = new Date().toLocaleDateString('pt-BR').replaceAll('/', '_');
+    await page.evaluate((currentDatePptr) => {
 
-        $(`.floatLeft.DiaApontamento.${currentDate}`).addClass(`data-${currentDate}`);
+        $(`.floatLeft.DiaApontamento.${currentDatePptr}`).addClass(`data-${currentDatePptr}`);
 
-    });
+    }, currentDatePptr);
 
         
     await page.waitForSelector(
@@ -45,14 +42,26 @@ async function init() {
         }
     );
 
-    await page.$eval(`.data-${currentDatePptr} .TimeIN input`, el => el.value = '09:00');
-    await page.click(`.data-${currentDatePptr} .emptySlot`),
+    const timeInOutWork = adjustMinutes(Math.floor(Math.random() * 59));
+    let timeInOutLunch = adjustMinutes(Math.floor(Math.random() * 59));
+    
+    await page.evaluate((timeInOutWork, currentDatePptr) => {
 
-    await page.keyboard.type('18:00');
+        $(`.data-${currentDatePptr} .TimeIN input`).val(`09:${timeInOutWork}`);
+
+    }, timeInOutWork, currentDatePptr);
+
+    await page.click(`.data-${currentDatePptr} .emptySlot`),
+    await page.keyboard.type(`18:${timeInOutWork}`);
     await page.click(`.data-${currentDatePptr} .emptySlot`);
-    await page.keyboard.type('13:00');
+
+    if(timeInOutWork === timeInOutLunch) {
+        timeInOutLunch = adjustMinutes(Math.floor(Math.random() * 59));
+    }
+
+    await page.keyboard.type(`13:${timeInOutLunch}`);
     await page.click(`.data-${currentDatePptr} .emptySlot`);
-    await page.keyboard.type('12:00'); 
+    await page.keyboard.type(`12:${timeInOutLunch}`); 
     
     await page.click('#ButtonSalvarApontamentos');
     await page.waitForSelector(
@@ -68,6 +77,10 @@ async function init() {
     console.log(`horas para o dia ${new Date().toLocaleDateString('pt-BR')} lançadas com sucesso!`);
 
     await page.close();
+}
+
+function adjustMinutes(min) {
+    return min < 10 ? `0${min}`: `${min}`
 }
 
 function sleep(ms) {
