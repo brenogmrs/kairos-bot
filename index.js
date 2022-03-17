@@ -24,7 +24,7 @@ async function init() {
 
     await page.goto(`https://www.dimepkairos.com.br/Dimep/PedidosJustificativas/Index/${randomId}`);
 
-    await page.waitForSelector(`.floatLeft.DiaApontamento .LastSlot input`, {timeout: 3000});
+    await page.waitForSelector(`.floatLeft.DiaApontamento .LastSlot input`);
 
     const currentDatePptr = new Date().toLocaleDateString('pt-BR').replaceAll('/', '_');
 
@@ -74,9 +74,16 @@ async function init() {
     await page.click('input[value="Aplicar a Todos"]','Home Office - Contingência');
     await page.click('#SaveHorarios');
 
-    console.log(`horas para o dia ${new Date().toLocaleDateString('pt-BR')} lançadas com sucesso!`);
+    console.log(`horas para o dia ${new Date().toLocaleDateString('pt-BR')} lançadas em Home Office - Contingência com sucesso!`);
 
-    await page.close();
+    console.log(`
+        09:${timeInOutWork} \n
+        12:${timeInOutLunch} \n
+        13:${timeInOutLunch} \n
+        18:${timeInOutWork}
+    `)
+
+    await browser.close();
 }
 
 function adjustMinutes(min) {
